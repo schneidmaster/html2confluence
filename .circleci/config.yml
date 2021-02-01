@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  test:
+    working_directory: ~/html2confluence
+    docker:
+      - image: circleci/ruby:2.5
+        environment:
+          GEM_HOME: ~/html2confluence/vendor/bundle
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "html2confluence.gemspec" }}
+      - run:
+          name: Bundle
+          command: bundle check || bundle install --jobs=4 --retry=3
+      - save_cache:
+          key: dependency-cache-{{ checksum "html2confluence.gemspec" }}
+          paths:
+            - ./vendor/bundle
+      - run:
+          name: RSpec
+          command: bundle exec rspec
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test

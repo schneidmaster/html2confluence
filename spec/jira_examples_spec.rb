@@ -3,7 +3,6 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require 'html2confluence'
 
 describe HTMLToConfluenceParser, "when running JIRA examples" do
-  
   before :all do
     html = <<-END
 <h1><a name="Biggestheading"></a>Biggest heading</h1>
@@ -211,12 +210,9 @@ preformatted piece of text
 {noformat}
     END
     
-    
     parser = HTMLToConfluenceParser.new
     parser.feed(html)
-    @textile = parser.to_wiki_markup
-    #puts @textile
-    #puts RedCloth.new(@textile).to_html
+    @confluence = parser.to_wiki_markup
   end
 
   it "should convert images within a link" do
@@ -234,72 +230,71 @@ preformatted piece of text
 
     parser = HTMLToConfluenceParser.new
     parser.feed test_html
-    @textile = parser.to_wiki_markup
+    @confluence = parser.to_wiki_markup
 
-    @textile.should == "[!#{imagetarget}!|#{link}]"
+    expect(@confluence).to eq("[!#{imagetarget}!|#{link}]")
   end
 
   it "should convert heading tags" do
-    @textile.should match(/^h1. Biggest heading/)
-    @textile.should match(/^h2. Bigger heading/)
-    @textile.should match(/^h3. Big heading/)
-    @textile.should match(/^h4. Normal heading/)
-    @textile.should match(/^h5. Small heading/)
-    @textile.should match(/^h6. Smallest heading/)
+    expect(@confluence).to match(/^h1. Biggest heading/)
+    expect(@confluence).to match(/^h2. Bigger heading/)
+    expect(@confluence).to match(/^h3. Big heading/)
+    expect(@confluence).to match(/^h4. Normal heading/)
+    expect(@confluence).to match(/^h5. Small heading/)
+    expect(@confluence).to match(/^h6. Smallest heading/)
   end
   
   it "should convert inline formatting" do
-    @textile.should match(/^\*strong\*/)
-    @textile.should match(/^_emphasis_/)
-    @textile.should match(/^\?\?citation\?\?/)
-    @textile.should match(/^-deleted-/)
-    @textile.should match(/^\+inserted\+/)
-    @textile.should match(/^\^superscript\^/)
-    @textile.should match(/^\~subscript\~/)
-    @textile.should match(/^\{\{monospaced\}\}/)
+    expect(@confluence).to match(/^\*strong\*/)
+    expect(@confluence).to match(/^_emphasis_/)
+    expect(@confluence).to match(/^\?\?citation\?\?/)
+    expect(@confluence).to match(/^-deleted-/)
+    expect(@confluence).to match(/^\+inserted\+/)
+    expect(@confluence).to match(/^\^superscript\^/)
+    expect(@confluence).to match(/^\~subscript\~/)
+    expect(@confluence).to match(/^\{\{monospaced\}\}/)
   end
   
   it "should convert block quotes" do
-    @textile.should match(/^bq. Some block quoted text/)
-    @textile.should match(/^\{quote\}\s*here is quotable\s*content to be quoted\s*{quote}/)
+    expect(@confluence).to match(/^bq. Some block quoted text/)
+    expect(@confluence).to match(/^\{quote\}\s*here is quotable\s*content to be quoted\s*{quote}/)
   end
   
   it "should handle text color" do
-    @textile.should match(/^\{color\:red\}\s*look ma, red text!\s*\{color\}/)
+    expect(@confluence).to match(/^\{color\:red\}\s*look ma, red text!\s*\{color\}/)
   end
   
   it "should convert horizontal rules" do
-    @textile.should match(/^---/)
+    expect(@confluence).to match(/^---/)
   end
   
   it "should convert dashes" do
-    @textile.should match(/^a -- b/)
-    @textile.should match(/^a --- b/)
+    expect(@confluence).to match(/^a -- b/)
+    expect(@confluence).to match(/^a --- b/)
   end
   
   it "should convert links" do
-    @textile.should match(/^\[\#anchor\]/)
-    @textile.should match(/^\[http\:\/\/jira.atlassian.com\]/)
-    @textile.should match(/^\[Atlassian\|http\:\/\/atlassian.com\]/)
-    @textile.should match(/^\[file\:\/\/\/c\:\/temp\/foo.txt\]/)
+    expect(@confluence).to match(/^\[\#anchor\]/)
+    expect(@confluence).to match(/^\[http\:\/\/jira.atlassian.com\]/)
+    expect(@confluence).to match(/^\[Atlassian\|http\:\/\/atlassian.com\]/)
+    expect(@confluence).to match(/^\[file\:\/\/\/c\:\/temp\/foo.txt\]/)
   end
   
   it "should convert bullets" do
-    @textile.should match(/\* some\s*\* bullet\s*\*\* indented\s*\*\* bullets\s*\* points/)
-    @textile.should match(/- different\s*- bullet\s*- types/)
-    @textile.should match(/# a\s*# numbered\s*# list/)
-    @textile.should match(/# a\s*# numbered\s*#\* with\s*#\* nested\s*#\* bullet\s*# list/)
-    @textile.should match(/\* a\s*\* bulleted\s*\*# with\s*\*# nested\s*\*# numbered\s*\* list/)
+    expect(@confluence).to match(/\* some\s*\* bullet\s*\*\* indented\s*\*\* bullets\s*\* points/)
+    expect(@confluence).to match(/- different\s*- bullet\s*- types/)
+    expect(@confluence).to match(/# a\s*# numbered\s*# list/)
+    expect(@confluence).to match(/# a\s*# numbered\s*#\* with\s*#\* nested\s*#\* bullet\s*# list/)
+    expect(@confluence).to match(/\* a\s*\* bulleted\s*\*# with\s*\*# nested\s*\*# numbered\s*\* list/)
   end
   
   it "should convert pre blocks" do
-    @textile.should match(/^\{noformat\}\s*preformatted piece of text\s*so \*no\* further _formatting_ is done here\s*\{noformat\}/)
+    expect(@confluence).to match(/^\{noformat\}\s*preformatted piece of text\s*so \*no\* further _formatting_ is done here\s*\{noformat\}/)
   end
   
   it "should convert tables" do
-    @textile.should include("||heading 1 ||heading 2 ||heading 3 ||")
-    @textile.should include("|col A1 |col A2 |col A3 |")
-    @textile.should include("|col B1 |col B2 |col B3 |")
-  end
-  
+    expect(@confluence).to include("||heading 1 ||heading 2 ||heading 3 ||")
+    expect(@confluence).to include("|col A1 |col A2 |col A3 |")
+    expect(@confluence).to include("|col B1 |col B2 |col B3 |")
+  end  
 end
